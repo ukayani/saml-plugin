@@ -94,7 +94,7 @@ under the License.
     <dependency>
         <groupId>org.pac4j</groupId>
         <artifactId>pac4j-saml</artifactId>
-        <version>1.6.0</version>
+        <version>1.8.9</version>
     </dependency>
     <dependency>
       <groupId>xml-apis</groupId>

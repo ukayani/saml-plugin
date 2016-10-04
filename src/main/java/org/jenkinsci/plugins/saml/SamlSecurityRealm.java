@@ -35,16 +35,17 @@ import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.HttpResponses;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-import org.opensaml.common.xml.SAMLConstants;
+import org.opensaml.saml.common.xml.SAMLConstants;
 import org.pac4j.core.client.RedirectAction;
 import org.pac4j.core.client.RedirectAction.RedirectType;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.J2ERequestContext;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.exception.RequiresHttpAction;
-import org.pac4j.saml.client.Saml2Client;
-import org.pac4j.saml.credentials.Saml2Credentials;
-import org.pac4j.saml.profile.Saml2Profile;
+import org.pac4j.saml.client.SAML2Client;
+import org.pac4j.saml.client.SAML2ClientConfiguration;
+import org.pac4j.saml.credentials.SAML2Credentials;
+import org.pac4j.saml.profile.SAML2Profile;
 
 import com.google.common.base.Preconditions;
 
@@ -147,7 +148,7 @@ public class SamlSecurityRealm extends SecurityRealm {
     LOG.fine("SamlSecurityRealm.doCommenceLogin called. Using consumerServiceUrl " + getConsumerServiceUrl());
     request.getSession().setAttribute(REFERER_ATTRIBUTE, referer);
 
-    Saml2Client client = newClient();
+    SAML2Client client = newClient();
     WebContext context = new J2ERequestContext(request);
     try {
       RedirectAction action = client.getRedirectAction(context, true, false);
@@ -169,16 +170,16 @@ public class SamlSecurityRealm extends SecurityRealm {
   public HttpResponse doFinishLogin(StaplerRequest request, StaplerResponse response) {
     LOG.finer("SamlSecurityRealm.doFinishLogin called");
 
-    Saml2Client client = newClient();
+    SAML2Client client = newClient();
     WebContext context = new J2EContext(request, response);
-    Saml2Credentials credentials;
+    SAML2Credentials credentials;
     try {
       credentials = client.getCredentials(context);
     } catch (RequiresHttpAction e) {
       throw new IllegalStateException(e);
     }
 
-    Saml2Profile saml2Profile = client.getUserProfile(credentials, context);
+    SAML2Profile saml2Profile = client.getUserProfile(credentials, context);
 
     LOG.finer(saml2Profile.toString());
     // retrieve user display name
@@ -246,7 +247,7 @@ public class SamlSecurityRealm extends SecurityRealm {
    * @param saml2Profile
    * @return
    */
-  private String getUsernameFromProfile(Saml2Profile saml2Profile) {
+  private String getUsernameFromProfile(SAML2Profile saml2Profile) {
     if (usernameAttributeName != null) {
       Object attribute = saml2Profile.getAttribute(usernameAttributeName);
       if (attribute instanceof String) {
@@ -268,26 +269,27 @@ public class SamlSecurityRealm extends SecurityRealm {
    * they can configure their IdP.
    */
   public HttpResponse doMetadata(StaplerRequest request, StaplerResponse response) {
-    Saml2Client client = newClient();
+    SAML2Client client = newClient();
 
-    return HttpResponses.plainText(client.printClientMetadata());
+    return HttpResponses.plainText(client.getServiceProviderMetadataResolver().getMetadata());
   }
 
-  private Saml2Client newClient() {
+  private SAML2Client newClient() {
     Preconditions.checkNotNull(idpMetadata);
 
-    Saml2Client client = new Saml2Client();
-    client.setIdpMetadata(idpMetadata);
-    client.setCallbackUrl(getConsumerServiceUrl());
-    client.setDestinationBindingType(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
+    SAML2ClientConfiguration cfg = new SAML2ClientConfiguration();
+    cfg.setIdpMetadata(idpMetadata);
+    cfg.setCallbackUrl(getConsumerServiceUrl());
+    cfg.setDestinationBindingType(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
     if (encryptionData != null) {
-      client.setKeystorePath(encryptionData.getKeystorePath());
-      client.setKeystorePassword(encryptionData.getKeystorePassword());
-      client.setPrivateKeyPassword(encryptionData.getPrivateKeyPassword());
+      cfg.setKeystorePath(encryptionData.getKeystorePath());
+      cfg.setKeystorePassword(encryptionData.getKeystorePassword());
+      cfg.setPrivateKeyPassword(encryptionData.getPrivateKeyPassword());
     }
-    client.setMaximumAuthenticationLifetime(this.maximumAuthenticationLifetime);
+    cfg.setMaximumAuthenticationLifetime(this.maximumAuthenticationLifetime);
+    SAML2Client client = new SAML2Client(cfg);
     if (LOG.isLoggable(Level.FINE)) {
-      LOG.fine(client.printClientMetadata());
+      LOG.fine(client.getServiceProviderMetadataResolver().getMetadata());
     }
     return client;
   }
@@ -317,7 +319,7 @@ public class SamlSecurityRealm extends SecurityRealm {
   }
 
   public String getSpMetadata() {
-    return newClient().printClientMetadata();
+    return newClient().getServiceProviderMetadataResolver().getMetadata();
   }
 
   public String getDisplayNameAttributeName() {
