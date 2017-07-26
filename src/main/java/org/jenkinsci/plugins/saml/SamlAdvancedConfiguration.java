@@ -31,13 +31,20 @@ public class SamlAdvancedConfiguration {
   private final String  authnContextClassRef;
   private final String  spEntityId;
   private final Integer maximumSessionLifetime;
+  private final String groupRegexPattern;
+  private final String groupRegexReplace;
   
   @DataBoundConstructor
-  public SamlAdvancedConfiguration(Boolean forceAuthn, String authnContextClassRef, String spEntityId, Integer maximumSessionLifetime) {
+  public SamlAdvancedConfiguration(Boolean forceAuthn, String authnContextClassRef, String spEntityId, 
+                                   Integer maximumSessionLifetime,
+                                   String groupRegexPattern,
+                                   String groupRegexReplace) {
     this.forceAuthn = (forceAuthn != null) ? forceAuthn : false;
     this.authnContextClassRef = Util.fixEmptyAndTrim(authnContextClassRef);
     this.spEntityId = Util.fixEmptyAndTrim(spEntityId);
     this.maximumSessionLifetime = maximumSessionLifetime;
+    this.groupRegexPattern = groupRegexPattern;
+    this.groupRegexReplace = groupRegexReplace;
   }
 
   public Boolean getForceAuthn() {
@@ -56,13 +63,17 @@ public class SamlAdvancedConfiguration {
     return maximumSessionLifetime;
   }
 
+  public String getGroupRegexPattern() { return groupRegexPattern; }
+  public String getGroupRegexReplace() { return groupRegexReplace; }
+  
   @Override
   public String toString() {
     final StringBuffer sb = new StringBuffer("SamlAdvancedConfiguration{");
     sb.append("forceAuthn=").append(forceAuthn);
     sb.append(", authnContextClassRef='").append(StringUtils.defaultIfBlank(authnContextClassRef,"none")).append('\'');
     sb.append(", spEntityId='").append(StringUtils.defaultIfBlank(spEntityId,"none")).append('\'');
-    sb.append(", maximumSessionLifetime=").append(maximumSessionLifetime != null ? maximumSessionLifetime : "none");
+    sb.append(", groupRegexPattern=").append(groupRegexPattern != null ? groupRegexPattern : "none");
+    sb.append(", groupRegexReplace=").append(groupRegexReplace != null ? groupRegexPattern : "none");
     sb.append('}');
     return sb.toString();
   }

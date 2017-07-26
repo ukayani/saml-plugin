@@ -57,6 +57,13 @@
             <f:textbox default="86400" />
           </f:entry>
 
+          <f:entry title="Group Pattern" field="groupRegexPattern" help="/plugin/saml/help/groupRegexPattern.html">
+            <f:textbox />
+          </f:entry>
+          <f:entry title="Group Replace" field="groupRegexReplace" help="/plugin/saml/help/groupRegexReplace.html">
+            <f:textbox />
+          </f:entry>
+
         </f:optionalBlock>
       </table>
     </f:entry>

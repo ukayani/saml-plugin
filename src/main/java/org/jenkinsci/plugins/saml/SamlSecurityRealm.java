@@ -317,11 +317,25 @@ public class SamlSecurityRealm extends SecurityRealm {
     authorities.add(AUTHENTICATED_AUTHORITY);
     if (!groups.isEmpty()) {
       for (Object group : groups) {
-        SamlGroupAuthority ga = new SamlGroupAuthority((String)group);
+        String transformedGroup = transformGroup((String)group);
+        SamlGroupAuthority ga = new SamlGroupAuthority(transformedGroup);
         authorities.add(ga);
       }
     }
     return authorities;
+  }
+
+  /**
+   * Given a group, use the supplied regex pattern to transform it with a replacement. Also remove whitespace.
+   * @param group
+   * @return
+   */
+  private String transformGroup(String group) {
+    if (advancedConfiguration.getGroupRegexPattern() != null && advancedConfiguration.getGroupRegexReplace() != null) {
+      String transformed = group.replaceAll(advancedConfiguration.getGroupRegexPattern(), advancedConfiguration.getGroupRegexReplace());
+      return transformed.replaceAll("\\s+","");
+    }
+    return group;
   }
 
   /**
@@ -519,6 +533,14 @@ public class SamlSecurityRealm extends SecurityRealm {
 
   public Integer getMaximumSessionLifetime() {
     return advancedConfiguration != null ? advancedConfiguration.getMaximumSessionLifetime() : null;
+  }
+  
+  public String getGroupRegexPattern() {
+    return advancedConfiguration != null ? advancedConfiguration.getGroupRegexPattern() : null;
+  }
+
+  public String getGroupRegexReplace() {
+    return advancedConfiguration != null ? advancedConfiguration.getGroupRegexReplace() : null;
   }
 
   public SamlEncryptionData getEncryptionData() {

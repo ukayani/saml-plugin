@@ -1,0 +1,13 @@
+<div>
+    A regex pattern which will be applied for every group the user belongs to. Intended to be used in 
+    conjunction with the <em>Group Replace</em> field to transform a group's name.
+    
+    <pre>
+        Example:
+        
+        Prefix(\\w+),.*
+    </pre>
+    
+    This pattern would match for all groups that contain the word <em>Prefix</em> followed by some word characters and a comma.
+    The pattern also captures the word characters after the <em>Prefix</em>, allowing us to reference this in the <em>Group Replace</em> field.
+</div>
