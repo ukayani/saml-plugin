@@ -15,4 +15,10 @@
              help="/plugin/saml/help/maximumSessionLifetime.html">
         <f:number clazz="required number" min="0" default="86400"/>
     </f:entry>
+    <f:entry title="Group Pattern" field="groupRegexPattern" help="/plugin/saml/help/groupRegexPattern.html">
+        <f:textbox default="CN=([^,]+),.*"/>
+    </f:entry>
+    <f:entry title="Group Replace" field="groupRegexReplace" help="/plugin/saml/help/groupRegexReplace.html">
+        <f:textbox default="$1"/>
+    </f:entry>
 </j:jelly>

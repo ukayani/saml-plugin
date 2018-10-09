@@ -1,0 +1,16 @@
+<div>
+    A regex replacement which will be used to modify matching group names. Intended to be used in
+    conjunction with the <em>Group Pattern</em> field to transform a group's name. When the <em>Group Pattern</em> matches
+    a group, this replacement is used.
+
+    You may use back references to refer to captured groups from the <em>Group Pattern</em> field.
+    <pre>
+        Example:
+
+        Group Pattern = "Prefix(\\w+),.*"
+        Group Replace = "$1"
+    </pre>
+    This pattern would match for all groups that contain the word <em>Prefix</em> followed by some word characters and a comma.
+    The pattern also captures the word characters after the <em>Prefix</em> and replaces the group with this capture
+    using a back reference ($1).
+</div>
